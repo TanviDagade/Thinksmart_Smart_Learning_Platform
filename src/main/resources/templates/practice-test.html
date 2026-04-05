@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Think Smart | Practice Test</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .option {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .option:hover {
+            background: #eef2ff;
+            border-color: #6366f1;
+        }
+
+        .option.selected {
+            background: #6366f1;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark px-4">
+    <a class="navbar-brand" href="/home">Think Smart</a>
+    <a href="/home" class="btn btn-outline-light btn-sm">Dashboard</a>
+</nav>
+
+<div class="container mt-5">
+
+    <h3 class="fw-bold mb-3">
+        <i class="bi bi-pencil-square"></i> Practice Test
+    </h3>
+    <p class="text-muted">Choose subject and topic to begin your test</p>
+
+    <div class="quiz-card mt-4">
+
+        <!-- SUBJECT SELECT -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Select Subject</label>
+            <select class="form-select" id="subjectSelect" onchange="loadTopics()">
+                <option value="">-- Choose Subject --</option>
+                <option value="algebra">Algebra</option>
+                <option value="calculus">Calculus</option>
+                <option value="geometry">Geometry</option>
+                <option value="Probability & Statistics">Probability & Statistics</option>
+                <option value="Matrices & Determinants">Matrices & Determinants</option>
+            </select>
+        </div>
+
+        <!-- TOPIC SELECT -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Select Topic</label>
+            <select class="form-select" id="topicSelect">
+                <option value="">-- Choose Topic --</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="startTest()">Start Test</button>
+
+        <div id="result" class="text-center mt-4 d-none">
+            <h4 id="score"></h4>
+
+            <button id="performanceBtn"
+                    class="btn btn-info mt-3 me-2 d-none"
+                    onclick="showPerformance()">
+                View Performance
+            </button>
+
+            <button id="retakeBtn"
+                    class="btn btn-secondary mt-3 d-none"
+                    onclick="location.reload()">
+                Retake Test
+            </button>
+        </div>
+
+        <div id="quizArea" class="mt-4"></div>
+
+    </div>
+
+</div>
+
+<script>
+    let userAnswers = [];
+
+    const questionBank = {
+        algebra: {
+            "Linear Equations": [
+                { question: "Solve: 2x + 4 = 10", options: ["x = 2", "x = 3", "x = 4", "x = 6"], answer: "x = 3" },
+                { question: "Solve: 3x = 12", options: ["x = 2", "x = 3", "x = 4", "x = 6"], answer: "x = 4" },
+                { question: "Solve: x - 5 = 7", options: ["x = 10", "x = 12", "x = 14", "x = 2"], answer: "x = 12" },
+                { question: "Solve: 5x = 25", options: ["x = 3", "x = 5", "x = 6", "x = 10"], answer: "x = 5" },
+                { question: "Solve: x/2 = 6", options: ["x = 8", "x = 10", "x = 12", "x = 14"], answer: "x = 12" },
+                { question: "Solve: 4x - 8 = 0", options: ["x = 2", "x = -2", "x = 4", "x = 8"], answer: "x = 2" },
+                { question: "Solve: 7x + 3 = 24", options: ["x = 2", "x = 3", "x = 4", "x = 5"], answer: "x = 3" },
+                { question: "If 5x = 45, x = ?", options: ["5", "7", "8", "9"], answer: "9" },
+                { question: "Solve: 9x - 6 = 21", options: ["x = 2", "x = 3", "x = 4", "x = 5"], answer: "x = 3" },
+                { question: "Solve: 6x = 42", options: ["6", "7", "8", "9"], answer: "7" }
+            ],
+
+            "Quadratic Equations": [
+                { question: "What is the discriminant formula?", options: ["b²-4ac", "a²+b²", "2a+b", "4ac-b"], answer: "b²-4ac" },
+                { question: "Roots are real if?", options: ["D>0", "D<0", "D=0", "None"], answer: "D>0" },
+                { question: "Quadratic formula is?", options: ["(-b ± √(b²-4ac)) / 2a", "b²-4ac", "a²+b²", "None"], answer: "(-b ± √(b²-4ac)) / 2a" },
+                { question: "If D=0 roots are?", options: ["Distinct", "Equal", "Imaginary", "None"], answer: "Equal" },
+                { question: "Degree of quadratic?", options: ["1", "2", "3", "4"], answer: "2" },
+                { question: "Solve: x² - 4 = 0", options: ["±2", "2", "-2", "4"], answer: "±2" },
+                { question: "Value of D for x² + 4x + 4?", options: ["0", "4", "8", "16"], answer: "0" },
+                { question: "Nature of roots if D < 0?", options: ["Imaginary", "Real", "Equal", "None"], answer: "Imaginary" },
+                { question: "Sum of roots formula?", options: ["-b/a", "b/a", "c/a", "a/b"], answer: "-b/a" },
+                { question: "Product of roots formula?", options: ["c/a", "-b/a", "a/c", "None"], answer: "c/a" }
+            ],
+
+            "Polynomials": [
+                { question: "Degree of 3x³ + 2x² + x?", options: ["1", "2", "3", "4"], answer: "3" },
+                { question: "A binomial has how many terms?", options: ["1", "2", "3", "4"], answer: "2" },
+                { question: "Zero of x² - 9?", options: ["±3", "3", "-3", "9"], answer: "±3" },
+                { question: "Constant term in 5x² + 4x + 7?", options: ["5", "4", "7", "0"], answer: "7" },
+                { question: "Factor of x² - 1?", options: ["(x-1)(x+1)", "x²+1", "x-1", "None"], answer: "(x-1)(x+1)" },
+                { question: "Degree of constant polynomial?", options: ["0", "1", "2", "None"], answer: "0" },
+                { question: "Leading coefficient of 6x³ + 2x?", options: ["6", "2", "3", "0"], answer: "6" },
+                { question: "Polynomial of degree 1 is?", options: ["Linear", "Quadratic", "Cubic", "None"], answer: "Linear" },
+                { question: "Cubic polynomial degree?", options: ["3", "2", "1", "4"], answer: "3" },
+                { question: "x³ - 8 factor?", options: ["(x-2)(x²+2x+4)", "x-2", "x+2", "None"], answer: "(x-2)(x²+2x+4)" }
+            ],
+
+            "Systems of Equations": [
+                { question: "Solve: x + y = 5, x - y = 1", options: ["x=3,y=2", "x=2,y=3", "x=4,y=1", "x=1,y=4"], answer: "x=3,y=2" },
+                { question: "Method used to solve two linear equations?", options: ["Substitution", "Elimination", "Graphical", "All of these"], answer: "All of these" },
+                { question: "If x+y=6 and x=2, y=?", options: ["2", "3", "4", "5"], answer: "4" },
+                { question: "If 2x+y=7 and x=3, y=?", options: ["1", "2", "3", "4"], answer: "1" },
+                { question: "Two parallel lines have?", options: ["No solution", "One solution", "Infinite solutions", "None"], answer: "No solution" },
+                { question: "Two identical equations have?", options: ["Infinite solutions", "One solution", "No solution", "None"], answer: "Infinite solutions" },
+                { question: "If x+y=10 and y=4, x=?", options: ["4", "5", "6", "7"], answer: "6" },
+                { question: "Solve: 2x+y=8, x=3, y=?", options: ["1", "2", "3", "4"], answer: "2" },
+                { question: "Consistent system means?", options: ["At least one solution", "No solution", "Infinite equations", "None"], answer: "At least one solution" },
+                { question: "Inconsistent system means?", options: ["No solution", "One solution", "Infinite solutions", "None"], answer: "No solution" }
+            ],
+
+            "Inequalities": [
+                { question: "Solve: 2x > 6", options: ["x>3", "x<3", "x=3", "None"], answer: "x>3" },
+                { question: "Solve: x - 5 ≥ 2", options: ["x≥7", "x≤7", "x=7", "None"], answer: "x≥7" },
+                { question: "If x < 4, which is true?", options: ["3", "5", "6", "7"], answer: "3" },
+                { question: "Multiplying inequality by negative flips?", options: ["Sign", "Number", "Equation", "None"], answer: "Sign" },
+                { question: "Solve: 3x ≤ 9", options: ["x≤3", "x≥3", "x=3", "None"], answer: "x≤3" },
+                { question: "Graph of x>2 is?", options: ["Right side", "Left side", "Both", "None"], answer: "Right side" },
+                { question: "Solve: -2x > 4", options: ["x < -2", "x > -2", "x= -2", "None"], answer: "x < -2" },
+                { question: "Compound inequality example?", options: ["2<x<5", "x=5", "x+2", "None"], answer: "2<x<5" },
+                { question: "Solve: x+3 < 7", options: ["x<4", "x>4", "x=4", "None"], answer: "x<4" },
+                { question: "Inequality solution is usually?", options: ["Range", "Single value", "None", "Constant"], answer: "Range" }
+            ],
+
+            "Exponents & Logarithms": [
+                { question: "x² · x³ = ?", options: ["x⁵", "x⁶", "x⁴", "x⁹"], answer: "x⁵" },
+                { question: "x⁵ / x² = ?", options: ["x³", "x²", "x⁷", "x¹⁰"], answer: "x³" },
+                { question: "x⁰ = ?", options: ["1", "0", "x", "None"], answer: "1" },
+                { question: "10² = ?", options: ["100", "20", "10", "1000"], answer: "100" },
+                { question: "log₁₀ 100 = ?", options: ["1", "2", "10", "100"], answer: "2" },
+                { question: "log₁₀ 1000 = ?", options: ["2", "3", "10", "100"], answer: "3" },
+                { question: "a^m · a^n = ?", options: ["a^(m+n)", "a^(mn)", "a^(m-n)", "None"], answer: "a^(m+n)" },
+                { question: "a^m / a^n = ?", options: ["a^(m-n)", "a^(mn)", "a^(m+n)", "None"], answer: "a^(m-n)" },
+                { question: "2³ = ?", options: ["6", "8", "9", "4"], answer: "8" },
+                { question: "log a + log b = ?", options: ["log(ab)", "log(a+b)", "log(a-b)", "None"], answer: "log(ab)" }
+            ]
+        },
+
+        calculus: {
+            "Differentiation": [
+                { question: "d/dx (x²) = ?", options: ["2x", "x", "x²", "2"], answer: "2x" },
+                { question: "Power rule formula?", options: ["n·xⁿ⁻¹", "xⁿ", "nx", "None"], answer: "n·xⁿ⁻¹" },
+                { question: "Derivative of constant?", options: ["0", "1", "x", "None"], answer: "0" },
+                { question: "Chain rule applies to?", options: ["Composite functions", "Constants", "Linear only", "None"], answer: "Composite functions" },
+                { question: "d/dx (sin x) = ?", options: ["cos x", "-cos x", "tan x", "sec x"], answer: "cos x" },
+                { question: "d/dx (x³) = ?", options: ["3x²", "x²", "3x", "x³"], answer: "3x²" },
+                { question: "Derivative of e^x?", options: ["e^x", "xe^x", "1", "0"], answer: "e^x" },
+                { question: "Derivative of ln x?", options: ["1/x", "x", "ln x", "None"], answer: "1/x" },
+                { question: "Product rule formula?", options: ["u'v + uv'", "uv", "u+v", "None"], answer: "u'v + uv'" },
+                { question: "Derivative of cos x?", options: ["-sin x", "sin x", "cos x", "tan x"], answer: "-sin x" }
+            ],
+
+            "Applications of Derivatives": [
+                { question: "Critical points occur when derivative equals?", options: ["0", "1", "∞", "None"], answer: "0" },
+                { question: "Maximum or minimum points are called?", options: ["Extrema", "Roots", "Zeros", "None"], answer: "Extrema" },
+                { question: "If f''(x) > 0, function is?", options: ["Concave up", "Concave down", "Linear", "None"], answer: "Concave up" },
+                { question: "Slope of tangent line equals?", options: ["Derivative", "Integral", "Function", "Limit"], answer: "Derivative" },
+                { question: "Rate of change is represented by?", options: ["Derivative", "Integral", "Constant", "None"], answer: "Derivative" },
+                { question: "If f'(x) > 0, function is?", options: ["Increasing", "Decreasing", "Constant", "None"], answer: "Increasing" },
+                { question: "Second derivative test is used to find?", options: ["Max/Min", "Roots", "Area", "None"], answer: "Max/Min" },
+                { question: "Velocity is derivative of?", options: ["Position", "Acceleration", "Time", "None"], answer: "Position" },
+                { question: "Acceleration is derivative of?", options: ["Velocity", "Position", "Time", "None"], answer: "Velocity" },
+                { question: "Stationary point occurs when?", options: ["f'(x)=0", "f''(x)=0", "x=0", "None"], answer: "f'(x)=0" }
+            ],
+
+            "Integration": [
+                { question: "Integral is inverse of?", options: ["Derivative", "Limit", "Function", "None"], answer: "Derivative" },
+                { question: "∫ x² dx = ?", options: ["x³/3 + C", "2x", "x²/2", "x³ + C"], answer: "x³/3 + C" },
+                { question: "∫ 1 dx = ?", options: ["x + C", "1", "0", "None"], answer: "x + C" },
+                { question: "Constant of integration is?", options: ["C", "K", "Both", "None"], answer: "C" },
+                { question: "∫ sin x dx = ?", options: ["-cos x + C", "cos x", "sin x", "None"], answer: "-cos x + C" },
+                { question: "∫ cos x dx = ?", options: ["sin x + C", "-sin x", "cos x", "None"], answer: "sin x + C" },
+                { question: "∫ e^x dx = ?", options: ["e^x + C", "xe^x", "1", "None"], answer: "e^x + C" },
+                { question: "Definite integral gives?", options: ["Area under curve", "Slope", "Limit", "None"], answer: "Area under curve" },
+                { question: "Fundamental theorem connects?", options: ["Integration & Derivative", "Limit & Function", "Slope & Area", "None"], answer: "Integration & Derivative" },
+                { question: "∫ 0 dx = ?", options: ["C", "0", "1", "x"], answer: "C" }
+            ],
+
+            "Limits & Continuity": [
+                { question: "lim x→0 (sin x)/x = ?", options: ["1", "0", "∞", "None"], answer: "1" },
+                { question: "Limit defines?", options: ["Approaching value", "Exact value", "Integral", "None"], answer: "Approaching value" },
+                { question: "Function is continuous if?", options: ["Limit exists", "Discontinuous", "Undefined", "None"], answer: "Limit exists" },
+                { question: "lim x→a f(x) equals f(a) means?", options: ["Continuous", "Infinite", "Undefined", "None"], answer: "Continuous" },
+                { question: "lim x→∞ 1/x = ?", options: ["0", "1", "∞", "None"], answer: "0" },
+                { question: "Polynomial functions are?", options: ["Continuous", "Discontinuous", "Undefined", "None"], answer: "Continuous" },
+                { question: "If left limit ≠ right limit?", options: ["Limit doesn't exist", "Continuous", "Defined", "None"], answer: "Limit doesn't exist" },
+                { question: "lim x→0 x² = ?", options: ["0", "1", "∞", "None"], answer: "0" },
+                { question: "Rational function undefined when?", options: ["Denominator = 0", "Numerator = 0", "x=1", "None"], answer: "Denominator = 0" },
+                { question: "Continuity requires how many conditions?", options: ["3", "2", "1", "4"], answer: "3" }
+            ]
+
+        },
+
+        geometry: {
+            "Circle": [
+                { question: "Area of circle?", options: ["πr²", "2πr", "πd", "r²"], answer: "πr²" },
+                { question: "Circumference?", options: ["2πr", "πr²", "πd²", "r²"], answer: "2πr" },
+                { question: "Diameter = ?", options: ["2r", "r/2", "πr", "r²"], answer: "2r" },
+                { question: "Semicircle area?", options: ["½πr²", "πr²", "2πr", "πr"], answer: "½πr²" },
+                { question: "Sector area formula?", options: ["(θ/360)πr²", "2πr", "πr²", "None"], answer: "(θ/360)πr²" },
+                { question: "Arc length formula?", options: ["(θ/360)2πr", "πr²", "2πr", "None"], answer: "(θ/360)2πr" },
+                { question: "If radius doubles, area becomes?", options: ["4 times", "2 times", "Same", "Half"], answer: "4 times" },
+                { question: "π value approx?", options: ["3.14", "2.14", "4.13", "1.34"], answer: "3.14" },
+                { question: "Tangent touches circle at?", options: ["One point", "Two points", "Three points", "None"], answer: "One point" },
+                { question: "Angle at center is how many times angle at circumference?", options: ["2 times", "Same", "Half", "3 times"], answer: "2 times" }
+            ],
+
+            "Triangles": [
+                { question: "Sum of interior angles of triangle?", options: ["180°", "360°", "90°", "270°"], answer: "180°" },
+                { question: "Right triangle contains?", options: ["90° angle", "60° angle", "120° angle", "None"], answer: "90° angle" },
+                { question: "Pythagoras theorem formula?", options: ["a²+b²=c²", "a+b=c", "a²-b²=c²", "None"], answer: "a²+b²=c²" },
+                { question: "Equilateral triangle has sides?", options: ["Equal", "Unequal", "Two equal", "None"], answer: "Equal" },
+                { question: "Isosceles triangle has?", options: ["Two equal sides", "All equal", "No equal", "None"], answer: "Two equal sides" },
+                { question: "Area of triangle?", options: ["½bh", "bh", "b+h", "None"], answer: "½bh" },
+                { question: "Largest angle opposite?", options: ["Longest side", "Shortest side", "Equal side", "None"], answer: "Longest side" },
+                { question: "Hypotenuse is opposite?", options: ["Right angle", "Acute angle", "Obtuse angle", "None"], answer: "Right angle" },
+                { question: "Scalene triangle has?", options: ["All sides unequal", "All equal", "Two equal", "None"], answer: "All sides unequal" },
+                { question: "Angle bisector divides angle into?", options: ["Two equal parts", "Three parts", "Unequal parts", "None"], answer: "Two equal parts" }
+            ],
+
+            "Coordinate Geometry": [
+                { question: "Distance formula?", options: ["√((x2-x1)²+(y2-y1)²)", "x+y", "x-y", "None"], answer: "√((x2-x1)²+(y2-y1)²)" },
+                { question: "Midpoint formula?", options: ["((x1+x2)/2 , (y1+y2)/2)", "(x+y)/2", "None", "x-y"], answer: "((x1+x2)/2 , (y1+y2)/2)" },
+                { question: "Slope formula?", options: ["(y2-y1)/(x2-x1)", "x/y", "y/x", "None"], answer: "(y2-y1)/(x2-x1)" },
+                { question: "Slope of horizontal line?", options: ["0", "1", "Undefined", "None"], answer: "0" },
+                { question: "Slope of vertical line?", options: ["Undefined", "0", "1", "None"], answer: "Undefined" },
+                { question: "Equation of line?", options: ["y=mx+c", "x+y=0", "ax²+bx+c", "None"], answer: "y=mx+c" },
+                { question: "Origin coordinates?", options: ["(0,0)", "(1,1)", "(0,1)", "(1,0)"], answer: "(0,0)" },
+                { question: "Quadrant I signs?", options: ["(+,+)", "(-,+)", "(-,-)", "(+,-)"], answer: "(+,+)" },
+                { question: "Distance between identical points?", options: ["0", "1", "Undefined", "None"], answer: "0" },
+                { question: "If slope positive line is?", options: ["Increasing", "Decreasing", "Constant", "None"], answer: "Increasing" }
+            ],
+
+            "3D Geometry": [
+                { question: "Volume of cube?", options: ["a³", "a²", "6a²", "None"], answer: "a³" },
+                { question: "Surface area of cube?", options: ["6a²", "a³", "4a²", "None"], answer: "6a²" },
+                { question: "Volume of cuboid?", options: ["lbh", "lb", "bh", "None"], answer: "lbh" },
+                { question: "Volume of sphere?", options: ["4/3πr³", "πr²", "2πr", "None"], answer: "4/3πr³" },
+                { question: "Surface area of sphere?", options: ["4πr²", "πr²", "2πr", "None"], answer: "4πr²" },
+                { question: "Volume of cylinder?", options: ["πr²h", "2πr", "πr²", "None"], answer: "πr²h" },
+                { question: "Volume of cone?", options: ["1/3πr²h", "πr²h", "2πr", "None"], answer: "1/3πr²h" },
+                { question: "Diagonal of cube formula?", options: ["a√3", "a√2", "a²", "None"], answer: "a√3" },
+                { question: "Total faces of cube?", options: ["6", "4", "8", "12"], answer: "6" },
+                { question: "Sphere has edges?", options: ["0", "1", "2", "Infinite"], answer: "0" }
+            ],
+
+            "Mensuration": [
+                { question: "Area of rectangle?", options: ["l×b", "2(l+b)", "l+b", "None"], answer: "l×b" },
+                { question: "Perimeter of square?", options: ["4a", "a²", "2a", "None"], answer: "4a" },
+                { question: "Area of parallelogram?", options: ["base×height", "l+b", "½bh", "None"], answer: "base×height" },
+                { question: "Area of trapezium?", options: ["½(a+b)h", "bh", "a+b", "None"], answer: "½(a+b)h" },
+                { question: "Area of rhombus?", options: ["½d1d2", "a²", "bh", "None"], answer: "½d1d2" },
+                { question: "Perimeter of circle?", options: ["2πr", "πr²", "πd²", "None"], answer: "2πr" },
+                { question: "Area of square?", options: ["a²", "4a", "2a", "None"], answer: "a²" },
+                { question: "Diagonal of rectangle?", options: ["√(l²+b²)", "l+b", "lb", "None"], answer: "√(l²+b²)" },
+                { question: "Area of triangle?", options: ["½bh", "bh", "b+h", "None"], answer: "½bh" },
+                { question: "Circumference formula?", options: ["2πr", "πr²", "None", "r²"], answer: "2πr" }
+            ],
+
+            "Trigonometry": [
+                { question: "sin²θ + cos²θ = ?", options: ["1", "0", "2", "None"], answer: "1" },
+                { question: "tanθ = ?", options: ["sinθ/cosθ", "cosθ/sinθ", "1", "None"], answer: "sinθ/cosθ" },
+                { question: "sin 90° = ?", options: ["1", "0", "-1", "None"], answer: "1" },
+                { question: "cos 0° = ?", options: ["1", "0", "-1", "None"], answer: "1" },
+                { question: "tan 45° = ?", options: ["1", "0", "-1", "None"], answer: "1" },
+                { question: "cosecθ = ?", options: ["1/sinθ", "1/cosθ", "sinθ", "None"], answer: "1/sinθ" },
+                { question: "secθ = ?", options: ["1/cosθ", "1/sinθ", "tanθ", "None"], answer: "1/cosθ" },
+                { question: "cotθ = ?", options: ["1/tanθ", "tanθ", "sinθ", "None"], answer: "1/tanθ" },
+                { question: "sin 30° = ?", options: ["1/2", "√3/2", "1", "0"], answer: "1/2" },
+                { question: "cos 60° = ?", options: ["1/2", "√3/2", "1", "0"], answer: "1/2" }
+            ]
+        },
+
+        "Probability & Statistics": {
+            "Basic Probability": [
+                { question: "Probability value lies between?", options: ["0 and 1", "0 and 10", "1 and 100", "None"], answer: "0 and 1" },
+                { question: "Probability of certain event?", options: ["1", "0", "∞", "None"], answer: "1" },
+                { question: "Probability of impossible event?", options: ["0", "1", "∞", "None"], answer: "0" },
+                { question: "P(A) + P(A') = ?", options: ["1", "0", "2", "None"], answer: "1" },
+                { question: "Total outcomes are called?", options: ["Sample space", "Event", "Trial", "None"], answer: "Sample space" },
+                { question: "Favorable outcomes / Total outcomes is?", options: ["Probability", "Mean", "Mode", "None"], answer: "Probability" },
+                { question: "Coin has how many outcomes?", options: ["2", "1", "3", "4"], answer: "2" },
+                { question: "Rolling dice gives outcomes?", options: ["6", "2", "10", "None"], answer: "6" },
+                { question: "Mutually exclusive events cannot?", options: ["Occur together", "Occur separately", "Happen", "None"], answer: "Occur together" },
+                { question: "Complement of event A is?", options: ["A'", "A²", "1", "0"], answer: "A'" }
+            ],
+
+            "Conditional Probability": [
+                { question: "P(A|B) means?", options: ["Probability of A given B", "A and B", "A or B", "None"], answer: "Probability of A given B" },
+                { question: "Formula of conditional probability?", options: ["P(A∩B)/P(B)", "P(A)+P(B)", "P(A)-P(B)", "None"], answer: "P(A∩B)/P(B)" },
+                { question: "Independent events satisfy?", options: ["P(A∩B)=P(A)P(B)", "P(A+B)", "P(A-B)", "None"], answer: "P(A∩B)=P(A)P(B)" },
+                { question: "If events independent then P(A|B)=?", options: ["P(A)", "0", "1", "None"], answer: "P(A)" },
+                { question: "Bayes theorem relates?", options: ["Conditional probabilities", "Mean", "Variance", "None"], answer: "Conditional probabilities" },
+                { question: "Dependent events affect?", options: ["Each other", "Nothing", "Always equal", "None"], answer: "Each other" },
+                { question: "Intersection means?", options: ["Common outcomes", "All outcomes", "Separate", "None"], answer: "Common outcomes" },
+                { question: "Union means?", options: ["A or B", "A and B", "None", "Both"], answer: "A or B" },
+                { question: "P(A∩B) ≤ ?", options: ["P(A)", "2", "∞", "None"], answer: "P(A)" },
+                { question: "Conditional probability requires?", options: ["Given condition", "Total probability", "Mean", "None"], answer: "Given condition" }
+            ],
+
+            "Mean, Median & Mode": [
+                { question: "Mean is?", options: ["Average", "Middle value", "Most frequent", "None"], answer: "Average" },
+                { question: "Median is?", options: ["Middle value", "Average", "Mode", "None"], answer: "Middle value" },
+                { question: "Mode is?", options: ["Most frequent value", "Average", "Middle value", "None"], answer: "Most frequent value" },
+                { question: "Mean formula is?", options: ["Sum/Total values", "Total/Sum", "Value/Sum", "None"], answer: "Sum/Total values" },
+                { question: "Median for odd data is?", options: ["Middle number", "Average", "0", "None"], answer: "Middle number" },
+                { question: "Mode can be?", options: ["More than one", "Only one", "Zero", "None"], answer: "More than one" },
+                { question: "Arithmetic mean is affected by?", options: ["Extreme values", "Nothing", "Median", "None"], answer: "Extreme values" },
+                { question: "Median is not affected by?", options: ["Extreme values", "Mean", "Mode", "None"], answer: "Extreme values" },
+                { question: "Grouped data uses?", options: ["Class intervals", "Single value", "None", "Both"], answer: "Class intervals" },
+                { question: "Mean of first n natural numbers?", options: ["(n+1)/2", "n/2", "n", "None"], answer: "(n+1)/2" }
+            ],
+
+            "Variance & Standard Deviation": [
+                { question: "Variance measures?", options: ["Spread of data", "Center", "Mean", "None"], answer: "Spread of data" },
+                { question: "Standard deviation is?", options: ["Square root of variance", "Mean", "Median", "None"], answer: "Square root of variance" },
+                { question: "Higher SD means?", options: ["More spread", "Less spread", "No change", "None"], answer: "More spread" },
+                { question: "Variance is always?", options: ["Positive", "Negative", "Zero", "None"], answer: "Positive" },
+                { question: "Symbol of standard deviation?", options: ["σ", "μ", "π", "None"], answer: "σ" },
+                { question: "Mean deviation measures?", options: ["Average deviation", "Total", "Zero", "None"], answer: "Average deviation" },
+                { question: "If all values same, SD is?", options: ["0", "1", "∞", "None"], answer: "0" },
+                { question: "Population variance divides by?", options: ["N", "N-1", "1", "None"], answer: "N" },
+                { question: "Sample variance divides by?", options: ["N-1", "N", "0", "None"], answer: "N-1" },
+                { question: "Standard deviation unit is?", options: ["Same as data", "Squared unit", "None", "Different"], answer: "Same as data" }
+            ],
+
+            "Permutations & Combinations": [
+                { question: "n! means?", options: ["Factorial", "Multiply n", "Add n", "None"], answer: "Factorial" },
+                { question: "0! equals?", options: ["1", "0", "∞", "None"], answer: "1" },
+                { question: "Permutation formula?", options: ["nPr", "nCr", "n+r", "None"], answer: "nPr" },
+                { question: "Combination formula?", options: ["nCr", "nPr", "n+r", "None"], answer: "nCr" },
+                { question: "Permutation considers?", options: ["Order", "No order", "None", "Both"], answer: "Order" },
+                { question: "Combination considers?", options: ["No order", "Order", "Both", "None"], answer: "No order" },
+                { question: "Formula of nCr?", options: ["n!/(r!(n-r)!)", "n!/r!", "r!/n!", "None"], answer: "n!/(r!(n-r)!)" },
+                { question: "Formula of nPr?", options: ["n!/(n-r)!", "n!/(r!(n-r)!)", "n+r", "None"], answer: "n!/(n-r)!" },
+                { question: "5! equals?", options: ["120", "60", "20", "None"], answer: "120" },
+                { question: "If r>n then nCr?", options: ["0", "1", "n", "None"], answer: "0" }
+            ]
+        },
+
+        "Matrices & Determinants": {
+            "Introduction to Matrices": [
+                { question: "Matrix is a rectangular array of?", options: ["Numbers", "Functions", "Variables", "None"], answer: "Numbers" },
+                { question: "Order of matrix is?", options: ["Rows × Columns", "Columns × Rows", "Rows + Columns", "None"], answer: "Rows × Columns" },
+                { question: "A 3×2 matrix has?", options: ["3 rows & 2 columns", "2 rows & 3 columns", "5 elements", "None"], answer: "3 rows & 2 columns" },
+                { question: "Row matrix has?", options: ["One row", "One column", "Equal rows & columns", "None"], answer: "One row" },
+                { question: "Column matrix has?", options: ["One column", "One row", "Square form", "None"], answer: "One column" },
+                { question: "Square matrix has?", options: ["Equal rows & columns", "One row", "One column", "None"], answer: "Equal rows & columns" },
+                { question: "Zero matrix contains?", options: ["All zeros", "All ones", "Random numbers", "None"], answer: "All zeros" },
+                { question: "Diagonal matrix has non-zero elements on?", options: ["Main diagonal", "All positions", "Last row", "None"], answer: "Main diagonal" },
+                { question: "Identity matrix diagonal elements are?", options: ["1", "0", "2", "None"], answer: "1" },
+                { question: "Equal matrices have?", options: ["Same order & elements", "Same rows only", "Same columns only", "None"], answer: "Same order & elements" }
+            ],
+
+            "Matrix Operations": [
+                { question: "Matrices can be added if?", options: ["Same order", "Square", "Same rows", "None"], answer: "Same order" },
+                { question: "Scalar multiplication means?", options: ["Multiply by number", "Add number", "Divide number", "None"], answer: "Multiply by number" },
+                { question: "Matrix multiplication condition?", options: ["Columns of first = rows of second", "Same order", "Square only", "None"], answer: "Columns of first = rows of second" },
+                { question: "Matrix multiplication is?", options: ["Not commutative", "Commutative", "Always equal", "None"], answer: "Not commutative" },
+                { question: "If A is m×n and B is n×p, AB is?", options: ["m×p", "n×m", "p×m", "None"], answer: "m×p" },
+                { question: "Transpose of matrix A is denoted by?", options: ["Aᵀ", "A⁻¹", "A²", "None"], answer: "Aᵀ" },
+                { question: "Transpose changes?", options: ["Rows to columns", "Columns to rows only", "Nothing", "None"], answer: "Rows to columns" },
+                { question: "If Aᵀᵀ equals?", options: ["A", "0", "A⁻¹", "None"], answer: "A" },
+                { question: "Identity matrix acts as?", options: ["Multiplicative identity", "Zero matrix", "Scalar", "None"], answer: "Multiplicative identity" },
+                { question: "AB = BA generally?", options: ["False", "True", "Always", "None"], answer: "False" }
+            ],
+
+            "Matrix Operations (Numerical)": [
+                {
+                    question: "If A = [1 2; 3 4] and B = [2 0; 1 2], find AB.",
+                    options: ["[4 4; 10 8]", "[2 4; 6 8]", "[3 2; 7 6]", "None"],
+                    answer: "[4 4; 10 8]"
+                },
+                {
+                    question: "If A = [2 1; 0 3], find A².",
+                    options: ["[4 5; 0 9]", "[4 2; 0 9]", "[2 1; 0 9]", "None"],
+                    answer: "[4 5; 0 9]"
+                },
+                {
+                    question: "Find transpose of [1 2 3; 4 5 6].",
+                    options: ["[1 4; 2 5; 3 6]", "[1 2; 3 4; 5 6]", "[1 2 3; 4 5 6]", "None"],
+                    answer: "[1 4; 2 5; 3 6]"
+                },
+                {
+                    question: "If A = [1 0; 0 1], find 3A.",
+                    options: ["[3 0; 0 3]", "[1 0; 0 1]", "[0 0; 0 0]", "None"],
+                    answer: "[3 0; 0 3]"
+                },
+                {
+                    question: "If A = [1 2; 3 4], find A + A.",
+                    options: ["[2 4; 6 8]", "[1 2; 3 4]", "[0 0; 0 0]", "None"],
+                    answer: "[2 4; 6 8]"
+                }
+            ],
+
+            "Determinants": [
+                { question: "Determinant is defined for?", options: ["Square matrix", "Row matrix", "Column matrix", "None"], answer: "Square matrix" },
+                { question: "Determinant of 2×2 matrix |a b; c d| is?", options: ["ad - bc", "ab - cd", "ac - bd", "None"], answer: "ad - bc" },
+                { question: "If determinant = 0, matrix is?", options: ["Singular", "Non-singular", "Identity", "None"], answer: "Singular" },
+                { question: "If determinant ≠ 0, matrix is?", options: ["Non-singular", "Singular", "Zero", "None"], answer: "Non-singular" },
+                { question: "Determinant of identity matrix is?", options: ["1", "0", "n", "None"], answer: "1" },
+                { question: "Determinant changes sign if?", options: ["Two rows interchanged", "Rows added", "Columns same", "None"], answer: "Two rows interchanged" },
+                { question: "Minor is obtained by?", options: ["Deleting row & column", "Adding row", "Transpose", "None"], answer: "Deleting row & column" },
+                { question: "Cofactor includes?", options: ["Sign factor", "Minor only", "Determinant only", "None"], answer: "Sign factor" },
+                { question: "Determinant of triangular matrix equals?", options: ["Product of diagonal elements", "Sum of diagonal", "0", "None"], answer: "Product of diagonal elements" },
+                { question: "Determinant of zero matrix is?", options: ["0", "1", "Undefined", "None"], answer: "0" }
+            ],
+
+            "Determinants (Numerical)": [
+                {
+                    question: "Find determinant of [2 3; 1 4].",
+                    options: ["5", "8", "10", "None"],
+                    answer: "5"
+                },
+                {
+                    question: "Find determinant of [1 2; 3 6].",
+                    options: ["0", "6", "4", "None"],
+                    answer: "0"
+                },
+                {
+                    question: "Find determinant of identity matrix 2×2.",
+                    options: ["1", "0", "2", "None"],
+                    answer: "1"
+                },
+                {
+                    question: "Find determinant of [4 0; 0 5].",
+                    options: ["20", "9", "0", "None"],
+                    answer: "20"
+                },
+                {
+                    question: "If determinant is 0, matrix is?",
+                    options: ["Singular", "Non-singular", "Identity", "None"],
+                    answer: "Singular"
+                }
+            ],
+
+            "Adjoint & Inverse": [
+                { question: "Inverse exists if determinant is?", options: ["Non-zero", "Zero", "One", "None"], answer: "Non-zero" },
+                { question: "Inverse formula is?", options: ["Adj(A)/|A|", "A²", "1/A", "None"], answer: "Adj(A)/|A|" },
+                { question: "AA⁻¹ equals?", options: ["I", "0", "A", "None"], answer: "I" },
+                { question: "Inverse of identity matrix is?", options: ["Identity", "Zero", "Undefined", "None"], answer: "Identity" },
+                { question: "Singular matrix has inverse?", options: ["No", "Yes", "Always", "None"], answer: "No" },
+                { question: "Adjoint is transpose of?", options: ["Cofactor matrix", "Minor matrix", "Original matrix", "None"], answer: "Cofactor matrix" },
+                { question: "Inverse of 2×2 matrix uses?", options: ["ad - bc", "a+b", "a-b", "None"], answer: "ad - bc" },
+                { question: "If |A| = 1, inverse is?", options: ["Adj(A)", "A", "0", "None"], answer: "Adj(A)" },
+                { question: "A × I equals?", options: ["A", "I", "0", "None"], answer: "A" },
+                { question: "Inverse property holds for?", options: ["Square matrices", "All matrices", "Row matrices", "None"], answer: "Square matrices" }
+            ],
+
+            "Inverse (Numerical)": [
+                {
+                    question: "Find inverse of [1 0; 0 1].",
+                    options: ["[1 0; 0 1]", "[0 1; 1 0]", "[0 0; 0 0]", "None"],
+                    answer: "[1 0; 0 1]"
+                },
+                {
+                    question: "Find inverse of [2 0; 0 2].",
+                    options: ["[1/2 0; 0 1/2]", "[2 0; 0 2]", "[1 0; 0 1]", "None"],
+                    answer: "[1/2 0; 0 1/2]"
+                },
+                {
+                    question: "Find determinant of [3 1; 2 2].",
+                    options: ["4", "6", "5", "None"],
+                    answer: "4"
+                },
+                {
+                    question: "Inverse exists if determinant is?",
+                    options: ["Non-zero", "Zero", "Always", "None"],
+                    answer: "Non-zero"
+                },
+                {
+                    question: "If |A|=1, inverse equals?",
+                    options: ["Adj(A)", "A", "0", "None"],
+                    answer: "Adj(A)"
+                }
+            ],
+
+            "System of Linear Equations": [
+                { question: "AX = B represents?", options: ["Matrix equation", "Determinant", "Identity", "None"], answer: "Matrix equation" },
+                { question: "Solution exists if?", options: ["|A| ≠ 0", "|A| = 0", "Always", "None"], answer: "|A| ≠ 0" },
+                { question: "Cramer's Rule applies to?", options: ["Square systems", "All systems", "Non-square", "None"], answer: "Square systems" },
+                { question: "Unique solution when?", options: ["Non-singular matrix", "Singular matrix", "Zero matrix", "None"], answer: "Non-singular matrix" },
+                { question: "Infinite solutions when?", options: ["Rank conditions equal", "Determinant 1", "Always", "None"], answer: "Rank conditions equal" },
+                { question: "Inconsistent system has?", options: ["No solution", "One solution", "Two solutions", "None"], answer: "No solution" },
+                { question: "Augmented matrix combines?", options: ["A and B", "Two A", "Two B", "None"], answer: "A and B" },
+                { question: "Rank of matrix shows?", options: ["Number of independent rows", "Columns only", "Diagonal only", "None"], answer: "Number of independent rows" },
+                { question: "Homogeneous system always has?", options: ["Trivial solution", "No solution", "Unique always", "None"], answer: "Trivial solution" },
+                { question: "If A⁻¹ exists, solution of AX=B is?", options: ["X=A⁻¹B", "X=AB", "X=B", "None"], answer: "X=A⁻¹B" }
+            ],
+
+            "System of Equations (Numerical)": [
+                {
+                    question: "Solve: x + y = 3, x - y = 1. Find x.",
+                    options: ["2", "1", "3", "None"],
+                    answer: "2"
+                },
+                {
+                    question: "Solve: x + y = 3, x - y = 1. Find y.",
+                    options: ["1", "2", "0", "None"],
+                    answer: "1"
+                },
+                {
+                    question: "If AX=B and A⁻¹ exists, solution is?",
+                    options: ["X=A⁻¹B", "X=AB", "X=B", "None"],
+                    answer: "X=A⁻¹B"
+                },
+                {
+                    question: "If determinant ≠ 0, system has?",
+                    options: ["Unique solution", "No solution", "Infinite solutions", "None"],
+                    answer: "Unique solution"
+                },
+                {
+                    question: "If determinant = 0, system may have?",
+                    options: ["Infinite or no solution", "Unique solution", "Always unique", "None"],
+                    answer: "Infinite or no solution"
+                }
+            ]
+        }
+    };
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let selected = null;
+
+    const topics = {
+        algebra: ["Linear Equations", "Quadratic Equations",
+            "Polynomials", "Systems of Equations", "Inequalities",
+            "Exponents & Logarithms"],
+        calculus: ["Differentiation" , "Applications of Derivatives",
+            "Integration", "Limits & Continuity"],
+        geometry: ["Circle", "Triangles", "Coordinate Geometry", "3D Geometry",
+            "Mensuration", "Trigonometry"],
+        "Probability & Statistics": [
+            "Basic Probability",
+            "Conditional Probability",
+            "Mean, Median & Mode",
+            "Variance & Standard Deviation",
+            "Permutations & Combinations"
+        ],
+        "Matrices & Determinants": [
+            "Introduction to Matrices",
+            "Matrix Operations",
+            "Determinants",
+            "Determinants (Numerical)",
+            "Adjoint & Inverse",
+            "Inverse (Numerical)",
+            "System of Linear Equations",
+            "System of Equations (Numerical)"
+        ]
+    };
+
+    function loadTopics() {
+        const subject = document.getElementById("subjectSelect").value;
+        const topicSelect = document.getElementById("topicSelect");
+
+        topicSelect.innerHTML = '<option value="">-- Choose Topic --</option>';
+
+        if (questionBank[subject]) {
+            Object.keys(questionBank[subject]).forEach(topic => {
+                topicSelect.innerHTML += `<option value="${topic}">${topic}</option>`;
+            });
+        }
+    }
+
+    function startTest() {
+        const subject = document.getElementById("subjectSelect").value;
+        const topic = document.getElementById("topicSelect").value;
+        const quizArea = document.getElementById("quizArea");
+
+        if (!subject || !topic) {
+            quizArea.innerHTML = "<p class='text-danger'>Please select subject and topic.</p>";
+            return;
+        }
+
+        currentQuestions = questionBank[subject][topic];
+        currentIndex = 0;
+        score = 0;
+        userAnswers = [];
+
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const quizArea = document.getElementById("quizArea");
+        const q = currentQuestions[currentIndex];
+
+        quizArea.innerHTML = `
+        <h5>Question ${currentIndex + 1} of ${currentQuestions.length}</h5>
+        <p class="mt-3">${q.question}</p>
+
+        ${q.options.map(opt =>
+            `<div class="option" onclick="selectOption(this)">${opt}</div>`
+        ).join("")}
+
+        <button class="btn btn-success mt-3" onclick="nextQuestion()">Next</button>
+        <div id="result" class="mt-2"></div>
+    `;
+
+        selected = null;
+    }
+
+    function selectOption(element) {
+        document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+        selected = element.innerText;
+    }
+
+    function nextQuestion() {
+        const result = document.getElementById("result");
+
+        if (!selected) {
+            result.innerHTML = "<span class='text-danger'>Select an option first.</span>";
+            return;
+        }
+
+        // Save answer for performance
+        userAnswers.push({
+            question: currentQuestions[currentIndex].question,
+            selected: selected,
+            correct: currentQuestions[currentIndex].answer
+        });
+
+        if (selected === currentQuestions[currentIndex].answer) {
+            score++;
+        }
+
+        currentIndex++;
+
+        if (currentIndex < currentQuestions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        const quizArea = document.getElementById("quizArea");
+
+        quizArea.innerHTML = `
+        <h4 class="text-success">Test Completed ✔</h4>
+        <p class="mt-3">Your Score: <strong>${score} / ${currentQuestions.length}</strong></p>
+
+        <button class="btn btn-info mt-3 me-2" onclick="showPerformance()">
+            View Performance
+        </button>
+
+        <button class="btn btn-secondary mt-3" onclick="startTest()">
+            Retake Test
+        </button>
+    `;
+    }
+
+    function showPerformance() {
+        const container = document.getElementById("quizArea");
+        container.innerHTML = "<h4 class='mb-4'>Detailed Performance Report</h4>";
+
+        userAnswers.forEach((item, index) => {
+
+            const isCorrect = item.selected === item.correct;
+
+            container.innerHTML += `
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h6>Q${index + 1}. ${item.question}</h6>
+                    <p>
+                        <strong>Your Answer:</strong>
+                        <span class="${isCorrect ? 'text-success' : 'text-danger'}">
+                            ${item.selected}
+                        </span>
+                    </p>
+                    <p>
+                        <strong>Correct Answer:</strong>
+                        <span class="text-success">
+                            ${item.correct}
+                        </span>
+                    </p>
+                    <p>
+                        <strong>Status:</strong>
+                        ${isCorrect
+                ? "<span class='text-success'>✔ Correct</span>"
+                : "<span class='text-danger'>✖ Wrong</span>"}
+                    </p>
+                </div>
+            </div>
+        `;
+        });
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Think Smart | Formula Intelligence</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f1f5ff, #f9fafc);
+            overflow-x: hidden;
+            padding-top: 70px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: calc(100vh - 70px);
+            top: 70px;
+            background: white;
+            padding: 30px 20px;
+            position: fixed;
+            width: 240px;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.05);
+        }
+
+        .sidebar h5 {
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #444;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+        }
+
+        .search-box {
+            border-radius: 50px;
+            padding: 12px 20px;
+        }
+
+        /* Formula Card */
+        .formula-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        .formula-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(79,70,229,0.15);
+        }
+
+        .formula-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .formula-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .dark-mode {
+            background: #0f172a !important;
+            color: white !important;
+        }
+
+        .dark-mode .formula-card {
+            background: rgba(30,41,59,0.6);
+            color: white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark px-4 fixed-top">
+    <a class="navbar-brand" href="/home">Think Smart</a>
+
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-light btn-sm" onclick="toggleDarkMode()">
+            <i class="bi bi-moon"></i>
+        </button>
+
+        <a href="/home" class="btn btn-outline-light btn-sm">
+            Dashboard
+        </a>
+    </div>
+</nav>
+<!-- Sidebar -->
+<div class="sidebar">
+    <h5><i class="bi bi-journal-richtext"></i> Think Smart</h5>
+
+    <a href="#" onclick="filterCategory('all')">All</a>
+    <a href="#" onclick="filterCategory('algebra')">Algebra</a>
+    <a href="#" onclick="filterCategory('calculus')">Calculus</a>
+    <a href="#" onclick="filterCategory('geometry')">Geometry</a>
+
+    <hr>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Formula Intelligence System</h3>
+        <input type="text" id="searchInput" class="form-control w-50 search-box" placeholder="Search formulas...">
+    </div>
+
+    <div class="row g-4" id="formulaContainer">
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Identity: (a + b)²</div>
+                <div class="formula-text">
+                    (a + b)² = a² + 2ab + b²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Identity: (a − b)²</div>
+                <div class="formula-text">
+                    (a − b)² = a² − 2ab + b²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Difference of Squares</div>
+                <div class="formula-text">
+                    a² − b² = (a − b)(a + b)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">(a + b)³ Expansion</div>
+                <div class="formula-text">
+                    (a + b)³ = a³ + 3a²b + 3ab² + b³
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">(a − b)³ Expansion</div>
+                <div class="formula-text">
+                    (a − b)³ = a³ − 3a²b + 3ab² − b³
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Sum of Cubes</div>
+                <div class="formula-text">
+                    a³ + b³ = (a + b)(a² − ab + b²)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Difference of Cubes</div>
+                <div class="formula-text">
+                    a³ − b³ = (a − b)(a² + ab + b²)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Exponent Law: Product Rule</div>
+                <div class="formula-text">
+                    aᵐ · aⁿ = aᵐ⁺ⁿ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Exponent Law: Quotient Rule</div>
+                <div class="formula-text">
+                    aᵐ / aⁿ = aᵐ⁻ⁿ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Power of Power</div>
+                <div class="formula-text">
+                    (aᵐ)ⁿ = aᵐⁿ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Power of Product</div>
+                <div class="formula-text">
+                    (ab)ᵐ = aᵐbᵐ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Negative Exponent</div>
+                <div class="formula-text">
+                    a⁻ᵐ = 1 / aᵐ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Fractional Exponent</div>
+                <div class="formula-text">
+                    a¹⁄ⁿ = ⁿ√a
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Quadratic Standard Form</div>
+                <div class="formula-text">
+                    ax² + bx + c = 0
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Quadratic Formula</div>
+                <div class="formula-text">
+                    x = (-b ± √(b² − 4ac)) / 2a
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Discriminant</div>
+                <div class="formula-text">
+                    D = b² − 4ac
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Log Product Rule</div>
+                <div class="formula-text">
+                    log(ab) = log a + log b
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Log Quotient Rule</div>
+                <div class="formula-text">
+                    log(a/b) = log a − log b
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Log Power Rule</div>
+                <div class="formula-text">
+                    log(aⁿ) = n log a
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Change of Base</div>
+                <div class="formula-text">
+                    log_b(a) = log a / log b
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">AP nth Term</div>
+                <div class="formula-text">
+                    aₙ = a + (n − 1)d
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">AP Sum</div>
+                <div class="formula-text">
+                    Sₙ = n/2 [2a + (n − 1)d]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">GP nth Term</div>
+                <div class="formula-text">
+                    aₙ = arⁿ⁻¹
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">GP Sum</div>
+                <div class="formula-text">
+                    Sₙ = a(1 − rⁿ) / (1 − r)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Infinite GP</div>
+                <div class="formula-text">
+                    S = a / (1 − r),  |r| &lt; 1
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Binomial Theorem</div>
+                <div class="formula-text">
+                    (a + b)ⁿ = Σ (nCr) aⁿ⁻ʳ bʳ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">General Term</div>
+                <div class="formula-text">
+                    Tᵣ₊₁ = (nCr) aⁿ⁻ʳ bʳ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">2×2 Determinant</div>
+                <div class="formula-text">
+                    |A| = ad − bc
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="algebra">
+            <div class="formula-card">
+                <div class="formula-title">Inverse of 2×2 Matrix</div>
+                <div class="formula-text">
+                    A⁻¹ = (1/|A|) [ d  −b ; −c  a ]
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Standard Limit: sin x / x</div>
+                <div class="formula-text">
+                    lim (x → 0) (sin x / x) = 1
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Standard Limit: tan x / x</div>
+                <div class="formula-text">
+                    lim (x → 0) (tan x / x) = 1
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Limit: (1 − cos x) / x²</div>
+                <div class="formula-text">
+                    lim (x → 0) (1 − cos x)/x² = 1/2
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Limit: (eˣ − 1)/x</div>
+                <div class="formula-text">
+                    lim (x → 0) (eˣ − 1)/x = 1
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Limit: (aˣ − 1)/x</div>
+                <div class="formula-text">
+                    lim (x → 0) (aˣ − 1)/x = ln a
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Derivative of Constant</div>
+                <div class="formula-text">
+                    d/dx (c) = 0
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Power Rule</div>
+                <div class="formula-text">
+                    d/dx (xⁿ) = n xⁿ⁻¹
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Derivative of eˣ</div>
+                <div class="formula-text">
+                    d/dx (eˣ) = eˣ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Derivative of ln x</div>
+                <div class="formula-text">
+                    d/dx (ln x) = 1/x
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">d/dx (sin x)</div>
+                <div class="formula-text">
+                    cos x
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">d/dx (cos x)</div>
+                <div class="formula-text">
+                    − sin x
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">d/dx (tan x)</div>
+                <div class="formula-text">
+                    sec² x
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Product Rule</div>
+                <div class="formula-text">
+                    (uv)' = u'v + uv'
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Quotient Rule</div>
+                <div class="formula-text">
+                    (u/v)' = (v u' − u v') / v²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Chain Rule</div>
+                <div class="formula-text">
+                    dy/dx = (dy/du) · (du/dx)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">∫ xⁿ dx</div>
+                <div class="formula-text">
+                    ∫ xⁿ dx = xⁿ⁺¹ / (n+1) + C
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">∫ 1/x dx</div>
+                <div class="formula-text">
+                    ∫ (1/x) dx = ln|x| + C
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Integration by Parts</div>
+                <div class="formula-text">
+                    ∫ u dv = uv − ∫ v du
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="calculus">
+            <div class="formula-card">
+                <div class="formula-title">Fundamental Theorem of Calculus</div>
+                <div class="formula-text">
+                    ∫ₐᵇ f(x) dx = F(b) − F(a)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">Linear Differential Equation</div>
+                <div class="formula-text">
+                    dy/dx + Py = Q
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">Integrating Factor</div>
+                <div class="formula-text">
+                    IF = e^(∫P dx)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">Partial Derivative</div>
+                <div class="formula-text">
+                    ∂z/∂x
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">Gradient</div>
+                <div class="formula-text">
+                    ∇f
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">Divergence</div>
+                <div class="formula-text">
+                    ∇ · F
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">Curl</div>
+                <div class="formula-text">
+                    ∇ × F
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">L{1}</div>
+                <div class="formula-text">
+                    L{1} = 1/s
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">L{eᵃᵗ}</div>
+                <div class="formula-text">
+                    L{eᵃᵗ} = 1/(s − a)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">L{sin at}</div>
+                <div class="formula-text">
+                    L{sin at} = a/(s² + a²)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="engineering">
+            <div class="formula-card">
+                <div class="formula-title">L{cos at}</div>
+                <div class="formula-text">
+                    L{cos at} = s/(s² + a²)
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Triangle Area (Base–Height)</div>
+                <div class="formula-text">
+                    Area = (1/2) × base × height
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Heron's Formula</div>
+                <div class="formula-text">
+                    s = (a + b + c)/2 <br>
+                    Area = √[s(s − a)(s − b)(s − c)]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Area Using Two Sides & Angle</div>
+                <div class="formula-text">
+                    Area = (1/2) ab sin C
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Circumradius</div>
+                <div class="formula-text">
+                    R = abc / 4Δ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Inradius</div>
+                <div class="formula-text">
+                    r = Δ / s
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Area of Circle</div>
+                <div class="formula-text">
+                    A = πr²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Circumference</div>
+                <div class="formula-text">
+                    C = 2πr
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Arc Length</div>
+                <div class="formula-text">
+                    l = rθ  (θ in radians)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Sector Area</div>
+                <div class="formula-text">
+                    A = (1/2) r²θ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Equation of Circle</div>
+                <div class="formula-text">
+                    (x − h)² + (y − k)² = r²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Rectangle</div>
+                <div class="formula-text">
+                    Area = l × b <br>
+                    Perimeter = 2(l + b)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Square</div>
+                <div class="formula-text">
+                    Area = a² <br>
+                    Diagonal = a√2
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Parallelogram</div>
+                <div class="formula-text">
+                    Area = base × height
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Trapezium</div>
+                <div class="formula-text">
+                    Area = (1/2)(a + b)h
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="coordinate">
+            <div class="formula-card">
+                <div class="formula-title">Distance Formula</div>
+                <div class="formula-text">
+                    d = √[(x₂ − x₁)² + (y₂ − y₁)²]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="coordinate">
+            <div class="formula-card">
+                <div class="formula-title">Midpoint Formula</div>
+                <div class="formula-text">
+                    ((x₁ + x₂)/2 , (y₁ + y₂)/2)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="coordinate">
+            <div class="formula-card">
+                <div class="formula-title">Slope of Line</div>
+                <div class="formula-text">
+                    m = (y₂ − y₁)/(x₂ − x₁)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="coordinate">
+            <div class="formula-card">
+                <div class="formula-title">Equation of Line</div>
+                <div class="formula-text">
+                    y = mx + c <br>
+                    y − y₁ = m(x − x₁) <br>
+                    ax + by + c = 0
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="conic">
+            <div class="formula-card">
+                <div class="formula-title">Parabola</div>
+                <div class="formula-text">
+                    y² = 4ax <br>
+                    Focus: (a,0) <br>
+                    Latus Rectum = 4a
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="conic">
+            <div class="formula-card">
+                <div class="formula-title">Ellipse</div>
+                <div class="formula-text">
+                    x²/a² + y²/b² = 1 <br>
+                    e = √(a² − b²)/a
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="conic">
+            <div class="formula-card">
+                <div class="formula-title">Hyperbola</div>
+                <div class="formula-text">
+                    x²/a² − y²/b² = 1 <br>
+                    Asymptotes: y = ±(b/a)x
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="3d">
+            <div class="formula-card">
+                <div class="formula-title">Distance in 3D</div>
+                <div class="formula-text">
+                    d = √[(x₂ − x₁)² + (y₂ − y₁)² + (z₂ − z₁)²]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="3d">
+            <div class="formula-card">
+                <div class="formula-title">Plane Equation</div>
+                <div class="formula-text">
+                    ax + by + cz + d = 0
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="vector">
+            <div class="formula-card">
+                <div class="formula-title">Dot Product</div>
+                <div class="formula-text">
+                    A · B = |A||B| cosθ <br>
+                    = AxBx + AyBy + AzBz
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="vector">
+            <div class="formula-card">
+                <div class="formula-title">Cross Product</div>
+                <div class="formula-text">
+                    |A × B| = |A||B| sinθ
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="mensuration">
+            <div class="formula-card">
+                <div class="formula-title">Cube</div>
+                <div class="formula-text">
+                    Volume = a³ <br>
+                    Surface Area = 6a²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="mensuration">
+            <div class="formula-card">
+                <div class="formula-title">Sphere</div>
+                <div class="formula-text">
+                    Volume = (4/3)πr³ <br>
+                    Surface Area = 4πr²
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="mensuration">
+            <div class="formula-card">
+                <div class="formula-title">Cylinder</div>
+                <div class="formula-text">
+                    Volume = πr²h <br>
+                    CSA = 2πrh
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="mensuration">
+            <div class="formula-card">
+                <div class="formula-title">Cone</div>
+                <div class="formula-text">
+                    Volume = (1/3)πr²h <br>
+                    CSA = πrl
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Interior Angle Sum (Triangle)</div>
+                <div class="formula-text">
+                    180°
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Interior Angle Sum (Polygon)</div>
+                <div class="formula-text">
+                    (n − 2) × 180°
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 formula-item" data-category="geometry">
+            <div class="formula-card">
+                <div class="formula-title">Exterior Angle Sum</div>
+                <div class="formula-text">
+                    360°
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+
+function filterCategory(category) {
+        const items = document.querySelectorAll(".formula-item");
+        items.forEach(item => {
+            item.style.display =
+                category === "all" || item.dataset.category === category
+                    ? "block"
+                    : "none";
+        });
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+        let value = this.value.toLowerCase();
+        let items = document.querySelectorAll(".formula-item");
+
+        items.forEach(item => {
+            item.style.display = item.innerText.toLowerCase().includes(value)
+                ? "block"
+                : "none";
+        });
+    });
+
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+    }
+</script>
+
+</body>
+</html>

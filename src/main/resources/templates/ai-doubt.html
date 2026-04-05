@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ThinkSmart AI Chat</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            background: #f5f5f5;
+            padding-top: 65px;
+        }
+
+        /* Chat layout */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Messages */
+        .user-msg {
+            text-align: right;
+            margin-bottom: 12px;
+        }
+
+        .user-msg span {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 18px 18px 5px 18px;
+            display: inline-block;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .ai-msg {
+            text-align: left;
+            margin-bottom: 12px;
+            white-space: pre-line;
+            position: relative;
+        }
+
+        .ai-msg span {
+            background: #e9ecef;
+            color: black;
+            padding: 10px 15px;
+            border-radius: 18px 18px 18px 5px;
+            display: inline-block;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            display: block;
+            font-size: 12px;
+            margin-top: 5px;
+            margin-left: 10px;
+            color: #0d6efd;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* Input */
+        .chat-input {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #121212;
+        }
+
+        body.dark-mode .chat-header {
+            background: #1e1e1e;
+            color: white;
+        }
+
+        body.dark-mode .header-left small {
+            color: #bbb;
+        }
+
+        body.dark-mode .chat-input {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode .ai-msg span {
+            background: #2a2a2a;
+            color: white;
+        }
+
+        body.dark-mode input {
+            background: #2a2a2a;
+            color: white;
+            border: none;
+        }
+
+        body.dark-mode .chat-box {
+            background: #121212;
+        }
+
+        /* Smooth Hover */
+        .user-msg span,
+        .ai-msg span {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-msg span:hover,
+        .ai-msg span:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Typing Animation */
+        .typing {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 15px;
+            background: #2c2c2c;
+            border-radius: 15px;
+            width: fit-content;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: blink 1.4s infinite both;
+        }
+
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark fixed-top px-4">
+    <a class="navbar-brand" href="/home">Think Smart</a>
+
+    <div class="d-flex align-items-center gap-2">
+
+        <form method="post" th:action="@{/ai-doubt/new}">
+            <button type="submit" class="btn btn-outline-light btn-sm">
+                New Chat
+            </button>
+        </form>
+
+        <form method="post" th:action="@{/ai-doubt/clear}">
+            <button type="submit" class="btn btn-outline-light btn-sm">
+                Clear History
+            </button>
+        </form>
+
+        <a href="/home" class="btn btn-outline-light btn-sm">
+            Dashboard
+        </a>
+
+        <button onclick="toggleDark()" class="btn btn-outline-light btn-sm">
+            Dark
+        </button>
+
+    </div>
+</nav>
+
+<div class="chat-container">
+
+    <!-- Messages -->
+    <div id="chatContainer" class="chat-box">
+
+        <div th:each="msg : ${chatHistory}">
+
+            <div th:if="${#strings.startsWith(msg, 'USER:')}" class="user-msg">
+                <span th:utext="${#strings.substring(msg,5)}"></span>
+            </div>
+
+            <div th:if="${#strings.startsWith(msg, 'AI:')}" class="ai-msg">
+                <span th:utext="${#strings.substring(msg,3)}"></span>
+            </div>
+
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing" style="display:none;" class="ai-msg">
+            <div class="typing">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input">
+        <form id="chatForm" method="post" th:action="@{/ai-doubt/ask}">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       name="question"
+                       placeholder="Type your message..."
+                       required>
+                <button class="btn btn-primary">Send</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+
+    const chatContainer = document.getElementById("chatContainer");
+
+    function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    scrollToBottom();
+
+    const input = document.querySelector('input[name="question"]');
+    input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            this.form.submit();
+        }
+    });
+
+    const form = document.getElementById("chatForm");
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); // prevent default form submission
+        const input = this.querySelector('input[name="question"]');
+        const question = input.value.trim();
+        if (!question) return;
+
+        // Show typing animation
+        document.getElementById("typing").style.display = "block";
+
+        // Send AJAX request
+        fetch(this.action, {
+            method: "POST",
+            body: new FormData(this)
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Replace chat container content
+            chatContainer.innerHTML = html;
+            scrollToBottom();
+            input.value = "";
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Something went wrong.");
+        });
+    });
+
+    /* Copy Button Logic */
+    document.addEventListener("click", function(e) {
+        if (e.target.classList.contains("copy-btn")) {
+            let text = e.target.previousElementSibling.innerText;
+            navigator.clipboard.writeText(text);
+            e.target.innerText = "Copied!";
+            setTimeout(() => {
+                e.target.innerText = "Copy";
+            }, 1500);
+        }
+    });
+
+    /* Dark Mode Persistent */
+    function toggleDark() {
+        document.body.classList.toggle("dark-mode");
+
+        if (document.body.classList.contains("dark-mode")) {
+            localStorage.setItem("darkMode", "enabled");
+        } else {
+            localStorage.setItem("darkMode", "disabled");
+        }
+    }
+
+    window.onload = function() {
+        if (localStorage.getItem("darkMode") === "enabled") {
+            document.body.classList.add("dark-mode");
+        }
+        MathJax.typeset(); // Render MathJax
+        scrollToBottom();
+    };
+
+
+</script>
+
+</body>
+</html>
